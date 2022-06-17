@@ -1,5 +1,8 @@
 import pandas as pd
 from operator import itemgetter
+import time
+
+startTime = time.time()
 
 # Importing and formating CSV datas to a list
 data = pd.read_csv("Actions.csv")
@@ -54,3 +57,8 @@ def getRois(List, budget):
 best_actions = getRois(best_roi, 500)
 analyzed_actions = pd.DataFrame.from_dict(best_actions)
 analyzed_actions.to_csv("Action_analysis.csv", index=False, header=True)
+
+
+endTime = time.time() - startTime
+
+print(endTime)
