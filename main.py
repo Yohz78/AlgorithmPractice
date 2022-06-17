@@ -5,37 +5,32 @@ import time
 startTime = time.time()
 
 # Importing and formating CSV datas to a list
-data = pd.read_csv("Actions.csv")
-actions = data.Action
-prices = data.Prix
-benefices = data.Benefice
-formated_benefices = []
+data = pd.read_csv("dataset2_Python.csv")
+actions = data.name
+initial_price = data.price
+sell_price = data.profit
 
-for benefice in benefices:
-    formated_benefice = float(benefice.rstrip(benefice[-1]))
-    formated_benefice = round(1 + (formated_benefice / 100), 2)
-    formated_benefices.append(formated_benefice)
 
 # Analyzing the actions to set a list of best return on investment
 actions_revenus = []
 for i in range(len(actions)):
     action = actions[i]
-    price = prices[i]
-    benefice = formated_benefices[i]
-    final_value = round(price * benefice, 2)
-    revenu = round(final_value - price, 2)
-    roi = round(revenu / price, 3)
-    action_summary = [action, price, benefice, final_value, revenu, roi]
-    action_dictionary = {
-        "action": action,
-        "price": price,
-        "benefice": benefice,
-        "final_value": final_value,
-        "revenu": revenu,
-        "roi": roi,
-    }
-    actions_revenus.append(action_dictionary)
-best_roi = sorted(actions_revenus, key=itemgetter("roi"), reverse=True)
+    price = float(initial_price[i])
+    revenu = float(sell_price[i])
+    final_price = price * (1 + (revenu / 100))
+    gain = final_price - price
+    if price > 0:
+        roi = round(revenu / price, 3)
+        action_summary = [action, price, revenu, roi]
+        action_dictionary = {
+            "action": action,
+            "price": price,
+            "revenu": revenu,
+            "roi": roi,
+            "gain": gain,
+        }
+        actions_revenus.append(action_dictionary)
+best_roi = sorted(actions_revenus, key=itemgetter("revenu"), reverse=True)
 
 
 # Applying the client criteria to the list of best ROI
@@ -43,13 +38,19 @@ best_roi = sorted(actions_revenus, key=itemgetter("roi"), reverse=True)
 def getRois(List, budget):
     total_spent = 0
     action_to_buy = []
+    total_gain = 0
     for i in range(len(List)):
         action = List[i]
         price = action["price"]
         new_total = total_spent + price
         if new_total < budget:
+            gain = action["gain"]
+            total_gain += gain
             action_to_buy.append(action)
             total_spent += price
+    print(
+        f"Le total dépensé est de {total_spent} le bénéfice total est de {total_gain}"
+    )
     return action_to_buy
 
 
